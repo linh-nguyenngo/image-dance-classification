@@ -29,15 +29,18 @@ dataset_dir = "/content/gdrive/My Drive/Database/images"
 data_dir = pathlib.Path(dataset_dir)
 print(dataset_dir)
 
+# Count to make sure dataset is ready
 image_count = len(list(data_dir.glob('*/*.jpg')))
 print(image_count)
 
+# Define some variables to be used inside model
 batch_size = 64
 img_height = 250
 img_width = 250
 
+# Define traning dataset
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
-  data_dir, 
+  data_dir,
   shuffle=True,
   validation_split=0.2,
   subset="training",
@@ -45,6 +48,7 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   image_size=(img_height, img_width),
   batch_size=batch_size)
 
+# Define validating dataset
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
   shuffle=True,
@@ -54,9 +58,11 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   image_size=(img_height, img_width),
   batch_size=batch_size)
 
+# Check to make sure dataset is loaded
 class_names = train_ds.class_names
 print(class_names)
 
+# import matplotlib to provide ploting/drawing functions
 import matplotlib.pyplot as plt
 
 plt.figure(figsize=(10, 10))
@@ -72,8 +78,8 @@ for image_batch, labels_batch in train_ds:
   print(labels_batch.shape)
   break
 
+# Tuning for better performance by enabling caching
 AUTOTUNE = tf.data.experimental.AUTOTUNE
-
 train_ds = train_ds.cache().shuffle(5000).prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
@@ -85,10 +91,11 @@ first_image = image_batch[0]
 # Notice the pixels values are now in `[0,1]`.
 print(np.min(first_image), np.max(first_image))
 
+# Define augmentation variable to use in the model
 data_augmentation = keras.Sequential(
   [
-    layers.experimental.preprocessing.RandomFlip("horizontal", 
-                                                 input_shape=(img_height, 
+    layers.experimental.preprocessing.RandomFlip("horizontal",
+                                                 input_shape=(img_height,
                                                               img_width,
                                                               3)),
     layers.experimental.preprocessing.RandomRotation(0.1),
@@ -96,6 +103,7 @@ data_augmentation = keras.Sequential(
   ]
 )
 
+# Check to make sure images can be augmentated
 plt.figure(figsize=(10, 10))
 for images, _ in train_ds.take(1):
   for i in range(9):
@@ -104,8 +112,11 @@ for images, _ in train_ds.take(1):
     plt.imshow(augmented_images[0].numpy().astype("uint8"))
     plt.axis("off")
 
+# Define callback to stop training when neeeded
+# Only use when absolutely needed
 callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
 
+# Define model
 num_classes = 5
 model = Sequential([
   data_augmentation,
@@ -122,12 +133,15 @@ model = Sequential([
   layers.Dense(num_classes)
 ])
 
+# Complie model
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
+# View a summary of the model to check
 model.summary()
 
+# Start training
 epochs = 10
 history = model.fit(
   train_ds,
@@ -135,6 +149,7 @@ history = model.fit(
   epochs=epochs
 )
 
+# Get training results and put into graphs for better visulization
 epochs = len(history.history['loss'])
 
 acc = history.history['accuracy']
