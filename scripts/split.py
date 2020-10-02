@@ -8,18 +8,21 @@ import glob
 # apsara_videos_path = './videos/apsara/'
 # apsara_images_path = "./images/apsara/image%s.jpg"
 
-tarian_jorget_videos_path = './videos/tarian_jorget/'
-tarian_jorget_images_path = "./images/tarian_jorget/image%s.jpg"
+# tarian_jorget_videos_path = './videos/tarian_jorget/'
+# tarian_jorget_images_path = "./images/tarian_jorget/image%s.jpg"
 
-videos = glob.glob(tarian_jorget_videos_path + '*.mp4')
-frameRate = 0.5 #//it will capture image in each 0.5 second
+khen_videos_path = './videos/predictions/apsara/'
+khen_images_path = "./images/apsara_predict_1/image%s.jpg"
+
+videos = glob.glob(khen_videos_path + '*.mp4')
+frameRate = 1 #//it will capture image in each 0.5 second
 count=1
 
 def getFrame(vidcap, sec):
     vidcap.set(cv2.CAP_PROP_POS_MSEC,sec*1000)
     hasFrames,image = vidcap.read()
     if hasFrames:
-        cv2.imwrite(tarian_jorget_images_path %(str(count)), image) # save frame as JPG file
+        cv2.imwrite(khen_images_path %(str(count)), image) # save frame as JPG file
     return hasFrames
 
 for video in videos:

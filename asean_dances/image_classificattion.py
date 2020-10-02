@@ -16,7 +16,7 @@ import pathlib
 # data_dir = tf.keras.utils.get_file('flower_photos', origin=dataset_url, untar=True)
 # data_dir = pathlib.Path(data_dir)
 
-data_dir = './asean_dances'
+data_dir = './dances'
 
 # Load images from disk
 batch_size = 32
